@@ -1,5 +1,26 @@
 Revision history for Perl extension ExtUtils::Depends.
 
+0.202 Fri Mar  5 00:26:18 EST 2004
+	- add long-overdue version-checking import implementation.
+	- fixed a bad initial value bug that caused crashes if your setup
+	  did not need a call to set_libs.  [Ross]
+	- distribute the spec file.  [Ross]
+
+0.201 Thu Feb 12 15:33:47 EST 2004
+	- add_headers() is now deprecated.  it's functionality is provided
+	  by install(), and it is already a no-op in 0.200.
+	- remove code referring to @headers, since we don't actually keep a
+	  separate list of headers anymore.  (should we?)
+	- load() no longer returns the "header" key -- it should've been
+	  "headers", but i've simply removed all that code.
+
+0.200 Tue Feb 10 01:21:57 EST 2004
+	- completely rewritten.  attempted to retain backward compatibility,
+	  but some esoteric functionality is probably missing.  now stores
+	  dependency lists, so that module chaining is more useful.
+	- document just about everything.
+	- really, really, really needs a regression test suite.
+
 0.104 Fri Nov 21 01:34:57 EST 2003
 	- remove debian packaging files
 	- add licensing terms to pod.  Depends was originally part of
