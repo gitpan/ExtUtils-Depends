@@ -1,7 +1,8 @@
-MANIFEST
-README
-Changes
 Makefile.PL
+Changes
 lib/ExtUtils/Depends.pm
 t/01_load.t
-META.yml                                Module meta-data in YAML
+META.yml
+MANIFEST
+.cvsignore
+README
