@@ -3,4 +3,5 @@ README
 Changes
 Makefile.PL
 lib/ExtUtils/Depends.pm
+t/01_load.t
 META.yml                                Module meta-data in YAML
