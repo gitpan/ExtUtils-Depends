@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.13 2004/09/20 16:55:06 kaffeetisch Exp $
+# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.14 2005/01/23 18:49:49 muppetman Exp $
 #
 
 package ExtUtils::Depends;
@@ -10,7 +10,7 @@ use Carp;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.204';
+our $VERSION = '0.205';
 
 sub import {
 	my $class = shift;
