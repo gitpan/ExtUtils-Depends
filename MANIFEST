@@ -1,0 +1,6 @@
+MANIFEST
+README
+Changes
+Makefile.PL
+lib/ExtUtils/Depends.pm
+META.yml                                Module meta-data in YAML
