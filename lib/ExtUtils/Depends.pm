@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.10 2004/03/05 05:18:27 muppetman Exp $
+# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.13 2004/09/20 16:55:06 kaffeetisch Exp $
 #
 
 package ExtUtils::Depends;
@@ -10,7 +10,7 @@ use Carp;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.202';
+our $VERSION = '0.204';
 
 sub import {
 	my $class = shift;
@@ -64,8 +64,6 @@ sub set_inc {
 }
 
 sub set_libs {
-	#my $self = shift;
-	#push @{ $self->{libs} }, @_;
 	my ($self, $newlibs) = @_;
 	$self->{libs} = $newlibs;
 }
@@ -116,7 +114,7 @@ sub save_config {
 	use IO::File;
 
 	my ($self, $filename) = @_;
-	warn "writing $filename\n";
+	warn "Writing $filename\n";
 
 	my $file = IO::File->new (">".$filename)
 		or croak "can't open '$filename' for writing: $!\n";
@@ -181,10 +179,10 @@ sub load {
 	
 	no strict;
 
-	croak "no dependency information found for $dep"
+	croak "No dependency information found for $dep"
 		unless $instpath;
 
-	warn "found $dep in $instpath\n";
+	warn "Found $dep in $instpath\n";
 
 	if (not File::Spec->file_name_is_absolute ($instpath)) {
 		warn "instpath is not absolute; using cwd...\n";
@@ -285,8 +283,12 @@ sub get_makefile_vars {
 		INC => join (' ', uniquify @incbits),
 		LIBS => join (' ', uniquify @libsbits),
 		TYPEMAPS => [@typemaps],
-		PM => $self->{pm},
 	);
+	# we don't want to provide these if there is no data in them;
+	# that way, the caller can still get default behavior out of
+	# MakeMaker when INC, LIBS and TYPEMAPS are all that are required.
+	$vars{PM} = $self->{pm}
+		if %{ $self->{pm} };
 	$vars{clean} = { FILES => join (" ", @clean), }
 		if @clean;
 	$vars{OBJECT} = join (" ", @OBJECT)
