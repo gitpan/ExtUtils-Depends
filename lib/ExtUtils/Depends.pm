@@ -1,8 +1,9 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.2 2003/06/19 00:07:20 pcg Exp $
+# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.4 2003/07/08 18:12:50 muppetman Exp $
 #
 
 package ExtUtils::Depends;
+use File::Spec;
 use File::Basename;
 use Carp;
 use Cwd;
@@ -10,7 +11,7 @@ use IO::File;
 use strict;
 use vars qw($AUTOLOAD $VERSION);
 
-$VERSION = 0.101;
+$VERSION = 0.102;
 
 sub new {
 	my ($class, $package, @depends) = @_;
@@ -99,7 +100,8 @@ sub load {
 			die "Cannot load $_: $@\n";
 		}
 		$dir ||= ${"${_}::CORE"} || $INC{$file};
-		$dir = cwd().'/'.$dir unless $dir =~ m(^/);
+		$dir = cwd().'/'.$dir
+			unless File::Spec->file_name_is_absolute($dir);
 		warn "Found $name in $dir\n";
 		push @{$self->{_dtypemaps_}}, map {$dir.'/'.$_} @{"${_}::typemaps"};
 		#push @{$self->{_ddefs_}}, @{"${_}::defs"};
