@@ -1,5 +1,16 @@
 Revision history for Perl extension ExtUtils::Depends.
 
+0.300 Sun Mar 30 17:35:35 CEST 2008
+	- On MSWin32 and cygwin, find the link libraries of dependencies and
+          put them into LIBS.
+	- Add tests.
+	- Correct typos in the documentation.
+	- In get_makefile_vars, comment out the code that put the installed
+	  libraries into @OBJECT, which caused them to get deleted on
+	  realclean.
+	- In Makefile.PL, don't use the bogus package "MAIN".
+	- Remove debug spew.
+
 0.205 Sun Jan 23 13:20:14 EST 2005
 	- Disable the RPM-related postamble on Win32.  The 'date' command
 	  on windows is interactive, and caused Makefile.PL to hang.

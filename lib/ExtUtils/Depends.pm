@@ -1,5 +1,5 @@
 #
-# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.14 2005/01/23 18:49:49 muppetman Exp $
+# $Header: /cvsroot/gtk2-perl/gtk2-perl-xs/ExtUtils-Depends/lib/ExtUtils/Depends.pm,v 1.18 2008/03/30 15:36:23 kaffeetisch Exp $
 #
 
 package ExtUtils::Depends;
@@ -7,10 +7,11 @@ package ExtUtils::Depends;
 use strict;
 use warnings;
 use Carp;
+use File::Find;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.205';
+our $VERSION = '0.300';
 
 sub import {
 	my $class = shift;
@@ -114,7 +115,6 @@ sub save_config {
 	use IO::File;
 
 	my ($self, $filename) = @_;
-	warn "Writing $filename\n";
 
 	my $file = IO::File->new (">".$filename)
 		or croak "can't open '$filename' for writing: $!\n";
@@ -182,10 +182,7 @@ sub load {
 	croak "No dependency information found for $dep"
 		unless $instpath;
 
-	warn "Found $dep in $instpath\n";
-
 	if (not File::Spec->file_name_is_absolute ($instpath)) {
-		warn "instpath is not absolute; using cwd...\n";
 		$instpath = File::Spec->rel2abs ($instpath);
 	}
 
@@ -281,9 +278,10 @@ sub get_makefile_vars {
 
 	my %vars = (
 		INC => join (' ', uniquify @incbits),
-		LIBS => join (' ', uniquify @libsbits),
+		LIBS => join (' ', uniquify $self->find_extra_libs, @libsbits),
 		TYPEMAPS => [@typemaps],
 	);
+
 	# we don't want to provide these if there is no data in them;
 	# that way, the caller can still get default behavior out of
 	# MakeMaker when INC, LIBS and TYPEMAPS are all that are required.
@@ -297,6 +295,38 @@ sub get_makefile_vars {
 		if %XS;
 
 	%vars;
+}
+
+sub find_extra_libs {
+	my $self = shift;
+
+	my %mappers = (
+		MSWin32 => sub { $_[0] . '.lib' },
+		cygwin  => sub { 'lib' . $_[0] . '.dll.a'},
+	);
+	my $mapper = $mappers{$^O};
+	return () unless defined $mapper;
+
+	my @found_libs = ();
+	foreach my $name (keys %{ $self->{deps} }) {
+		(my $stem = $name) =~ s/^.*:://;
+		my $lib = $mapper->($stem);
+		my $pattern = qr/$lib$/;
+
+		my $matching_file;
+		find (sub {
+			if ((not $matching_file) && /$pattern/) {;
+				$matching_file = $File::Find::name;
+			}
+		}, map { -d $_ ? ($_) : () } @INC); # only extant dirs
+
+		if ($matching_file && -f $matching_file) {
+			push @found_libs, $matching_file;
+			next;
+		}
+	}
+
+	return @found_libs;
 }
 
 1;
@@ -313,7 +343,7 @@ ExtUtils::Depends - Easily build XS extensions that depend on XS extensions
 	$package = new ExtUtils::Depends ('pkg::name', 'base::package')
 	# set the flags and libraries to compile and link the module
 	$package->set_inc("-I/opt/blahblah");
-	$package->set_lib("-lmylib");
+	$package->set_libs("-lmylib");
 	# add a .c and an .xs file to compile
 	$package->add_c('code.c');
 	$package->add_xs('module-code.xs');
@@ -409,7 +439,7 @@ Add xs files to be compiled.
 
 Add C files to be compiled.
 
-=item $depends->typemaps (@typemaps)
+=item $depends->add_typemaps (@typemaps)
 
 Add typemap files to be used and installed.
 
@@ -491,11 +521,6 @@ C<get_deps> after calling C<add_deps> manually.
 
 
 =head1 BUGS
-
-As written, this module expects that RTLD_GLOBAL works on your platform,
-which is not always true, most notably, on win32.  We need to include a
-way to find the actual shared libraries created for extension modules
-so new extensions may be linked explicitly with them.
 
 Version 0.2 discards some of the more esoteric features provided by the
 older versions.  As they were completely undocumented, and this module
