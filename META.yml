@@ -1,12 +1,32 @@
 --- #YAML:1.0
-name:                ExtUtils-Depends
-version:             0.301
-abstract:            ~
-license:             ~
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
+name:               ExtUtils-Depends
+version:            0.302
+abstract:           ~
+author:  []
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    Test::More:           0
+requires:
+    Data::Dumper:  0
+    File::Spec:    0
+    IO::File:      0
+    perl:          5.006
+resources:
+    repository:  http://git.gnome.org/cgit/perl-ExtUtils-Depends
+no_index:
+    directory:
+        - t
+        - inc
+    package:  ExtUtils::MM
+generated_by:       ExtUtils::MakeMaker version 6.52
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - XS
+    - XS extensions
+    - dependency
