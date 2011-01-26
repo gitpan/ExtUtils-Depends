@@ -1,9 +1,8 @@
 Changes
 lib/ExtUtils/Depends.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml
 perl-ExtUtils-Depends.spec.in
 README
 t/01_load.t
@@ -15,3 +14,4 @@ t/inc/DepTest/DepTest.lib
 t/inc/DepTest/Install/.keep
 t/inc/DepTest/libDepTest.dll.a
 t/lib/TestHelper.pm
+META.yml                                 Module meta-data (added by MakeMaker)

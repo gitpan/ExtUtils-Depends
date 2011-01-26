@@ -11,7 +11,7 @@ use File::Find;
 use File::Spec;
 use Data::Dumper;
 
-our $VERSION = '0.303';
+our $VERSION = '0.304';
 
 sub import {
 	my $class = shift;
@@ -348,14 +348,16 @@ use Config;
 sub static_lib {
 	my $base = shift->SUPER::static_lib(@_);
 
-	return $base unless $^O =~ /MSWin32/ && $Config{cc} =~ /^gcc/i;
+	return $base unless $^O =~ /MSWin32/ && $Config{cc} =~ /\bgcc\b/i;
 
-	return <<'__EOM__';
+	my $DLLTOOL = $Config{'dlltool'} || 'dlltool';
+
+	return <<"__EOM__"
 # This isn't actually a static lib, it just has the same name on Win32.
-$(INST_DYNAMIC_LIB): $(INST_DYNAMIC)
-	dlltool --def $(EXPORT_LIST) --output-lib $@ --dllname $(BASEEXT).$(SO) $(INST_DYNAMIC)
+\$(INST_DYNAMIC_LIB): \$(INST_DYNAMIC)
+	$DLLTOOL --def \$(EXPORT_LIST) --output-lib \$\@ --dllname \$(BASEEXT).\$(SO) \$(INST_DYNAMIC)
 
-dynamic:: $(INST_DYNAMIC_LIB)
+dynamic:: \$(INST_DYNAMIC_LIB)
 __EOM__
 }
 

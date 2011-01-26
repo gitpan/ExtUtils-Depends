@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               ExtUtils-Depends
-version:            0.303
+version:            0.304
 abstract:           ~
 author:  []
 license:            perl
