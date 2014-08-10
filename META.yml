@@ -4,7 +4,7 @@ author:
   - 'Gtk2-Perl Team <gtk-perl-list at gnome dot org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test::More: '0'
+  Test::More: '0.88'
 configure_requires:
   Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
@@ -38,4 +38,4 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://dev.perl.org/licenses/
   repository: git://git.gnome.org/perl-ExtUtils-Depends
-version: '0.309'
+version: '0.400'
