@@ -7,6 +7,8 @@ use Test::More;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use TestHelper;
+use File::Path 'mkpath';
+use File::Spec::Functions 'catdir';
 
 use ExtUtils::Depends;
 
@@ -39,34 +41,6 @@ $dep_info->add_typemaps (@typemaps);
 my @installed_files = qw(dep.h
                          dep-private.h);
 $dep_info->install (@installed_files);
-
-my $INC_FRAG = '-Ddistinctive';
-map { make_fake($_) } qw(Fakenew Fakeold);
-sub Fakenew::Install::Files::Inline { +{ INC => $INC_FRAG } }
-sub Fakenew::Install::Files::deps { qw(Fakeold) }
-{
-  no warnings 'once';
-  @Fakeold::Install::Files::deps = qw(Fakenew);
-  $Fakeold::Install::Files::inc = $INC_FRAG;
-  $Fakeold::Install::Files::libs = '';
-}
-sub make_fake {
-  my $class = shift . '::Install::Files';
-  my @pieces = split '::', $class;
-  require File::Spec;
-  my $pm = join('/', @pieces) . '.pm';
-  $INC{$pm} = File::Spec->catdir(qw(build fake), split '/', $pm);
-}
-sub test_load {
-  my ($info, $msg) = @_;
-  my $install_part = qr|Fake.*Install|;
-  like ($info->{inc}, $install_part, "$msg inc generic");
-  like ($info->{inc}, qr/$INC_FRAG/, "$msg inc specific");
-  ok (scalar(grep { /Fake/ } @{$info->{deps}}), $msg);
-  ok (exists $info->{libs}, $msg);
-}
-test_load (ExtUtils::Depends::load('Fakenew'), 'load new scheme');
-test_load (ExtUtils::Depends::load('Fakeold'), 'load old scheme');
 
 use Data::Dumper;
 $Data::Dumper::Terse = 1;
@@ -145,6 +119,34 @@ is_deeply (
   'api check Inline method'
 );
 is_deeply ([ DepTest::Install::Files->deps ], [], 'api check deps method');
+
+# --------------------------------------------------------------------------- #
+
+my $INC_FRAG = '-Ddistinctive';
+make_test_pkg('PSnew', <<EOF);
+sub Inline { +{ INC => '$INC_FRAG' } }
+sub deps { qw(PSold) }
+EOF
+make_test_pkg('PSold', "\@deps = qw(PSnew); \$inc = '$INC_FRAG';");
+sub make_test_pkg {
+  my ($base, $text) = @_;
+  my $dir = catdir($tmp_inc, $base, qw(Install));
+  mkpath($dir, 0, 0711);
+  local *FH;
+  open FH, '>', catfile($dir, 'Files.pm');
+  print FH sprintf "package %s;\n%s\n1;\n", $base . '::Install::Files', $text;
+  close FH;
+}
+sub test_load {
+  my ($info, $msg) = @_;
+  my $install_part = qr|PS.*Install|;
+  like ($info->{inc}, $install_part, "$msg inc generic");
+  like ($info->{inc}, qr/$INC_FRAG/, "$msg inc specific");
+  ok (scalar(grep { /PS/ } @{$info->{deps}}), $msg);
+  ok (exists $info->{libs}, $msg);
+}
+test_load (ExtUtils::Depends::load('PSnew'), 'load new scheme');
+test_load (ExtUtils::Depends::load('PSold'), 'load old scheme');
 
 # --------------------------------------------------------------------------- #
 

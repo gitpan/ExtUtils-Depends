@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::File: '0'
-dynamic_config: 1
+dynamic_config: 0
 generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
 keywords:
   - XS
