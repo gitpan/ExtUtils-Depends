@@ -38,4 +38,4 @@ resources:
   homepage: http://gtk2-perl.sourceforge.net
   license: http://dev.perl.org/licenses/
   repository: git://git.gnome.org/perl-ExtUtils-Depends
-version: '0.401'
+version: '0.402'
